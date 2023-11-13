@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 
 void RemoveCharAtIndex(std::string& str, int index){
 	if (index >= 0 && index < str.length()){
@@ -60,7 +61,48 @@ void TestInsertCharAtPosition(){
 	std::cout << "Original string: " << testString << std::endl;
 
 	InsertCharAtPosition(testString, positionToInsert, charToInsert);
-	std::Cout << "String after inserting '" << charToInsert << "' at position " << positionToInsert << ": " << testString << std::endl;OB
+	std::cout << "String after inserting '" << charToInsert << "' at position " << positionToInsert << ": " << testString << std::endl;OB
+}
+
+double CalculateAverage(std::string& grades) {
+    int grade;
+    int sum = 0;
+    int count = 0;
+    size_t pos = 0;
+
+    while ((pos = grades.find(';')) != std::string::npos) {
+        grade = std::stoi(grades.substr(0, pos));
+        sum += grade;
+        ++count;
+        grades.erase(0, pos + 1);
+    }
+    if (!grades.empty()) {
+        grade = std::stoi(grades);
+        sum += grade;
+        ++count;
+    }
+    return count > 0 ? static_cast<double>(sum) / count : 0.0;
+}
+
+void ProcessFile(const std::string& inputFileName, const std::string& outputFileName) {
+    std::ifstream inputFile(inputFileName);
+    std::ofstream outputFile(outputFileName);
+    if (!inputFile.is_open() || !outputFile.is_open()) {
+        std::cerr << "Exception is thrown" << std::endl;
+        return;
+    }
+    std::string line;
+    while (std::getline(inputFile, line)) {
+        size_t pos = line.find(';');
+        if (pos != std::string::npos) {
+            std::string name = line.substr(0, pos);
+            std::string grades = line.substr(pos + 1);
+            double average = CalculateAverage(grades);
+            outputFile << name << " -> " << average << std::endl;
+        }
+    }
+    inputFile.close();
+    outputFile.close();
 }
 
 int main(){
